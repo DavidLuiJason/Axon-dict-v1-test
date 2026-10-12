@@ -6,6 +6,9 @@ on:
     paths-ignore: ['*.zip']
 permissions:
   contents: write
+concurrency:
+  group: axon-build-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   build-debug-apk:
     runs-on: ubuntu-24.04
@@ -101,16 +104,6 @@ jobs:
           name: axon-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-      - name: Commit lockfile and growing guard after successful build
-        run: |
-          set -euo pipefail
-          git config user.name axon-build
-          git config user.email axon-build@users.noreply.github.com
-          git add tools/files.lock package-lock.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'Build: pin dependencies and ratchet files'
-            git push
-          fi
       - name: Publish plain APK as a prerelease
         env:
           GH_TOKEN: ${{ github.token }}
@@ -121,8 +114,35 @@ jobs:
           else
             gh release create "$tag" android/app/build/outputs/apk/debug/app-debug.apk \
               --title "AXON debug $tag" --notes "Debug-only build. Use the same signing key for updates." \
-              --prerelease --target "$(git rev-parse HEAD)"
+              --prerelease --target "${{ github.sha }}"
           fi
+      - name: Commit lockfile and growing guard after successful build
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          git config user.name axon-build
+          git config user.email axon-build@users.noreply.github.com
+          git add tools/files.lock package-lock.json
+          if git diff --cached --quiet; then echo 'Nothing to commit.'; exit 0; fi
+          mkdir -p /tmp/axon-keep
+          cp package-lock.json /tmp/axon-keep/package-lock.json
+          for attempt in 1 2 3 4; do
+            if [ "$attempt" -gt 1 ]; then
+              git fetch origin "$BRANCH"
+              git reset --hard "origin/$BRANCH"
+              cp /tmp/axon-keep/package-lock.json package-lock.json
+              node tools/guard.mjs --ratchet
+              git add tools/files.lock package-lock.json
+            fi
+            if git diff --cached --quiet; then echo 'Remote already holds these files.'; exit 0; fi
+            git commit -q -m 'Build: pin dependencies and ratchet files'
+            if git push origin "HEAD:$BRANCH"; then echo 'Lock files saved.'; exit 0; fi
+            echo "Push rejected (attempt $attempt): the branch moved. Retrying on top of the newest commit."
+            sleep $((attempt * 5))
+          done
+          echo '::error::Could not save the lock files after 4 attempts. The APK and Release are already published.'
+          exit 1
       - name: Build summary
         if: always()
         run: |
