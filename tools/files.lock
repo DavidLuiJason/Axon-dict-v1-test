@@ -1,6 +1,6 @@
 {
  "version": 2,
- "seal": "78ade21189b31508529fcdc9619dc0dd7046b5c5bd2807b741d515fcf947f25d",
+ "seal": "ce3843fd503106ae0a6a17dcd1db5c93103fdffc704341d4fdb3e933d3e6515e",
  "dictionaries": [
   "public/dictionary/en"
  ],
@@ -182,6 +182,15 @@
   },
   "src/brain/index.ts": {
    "bytes": 1336
+  },
+  "src/brain/knowledge/dictionaryProvider.ts": {
+   "bytes": 3018
+  },
+  "src/brain/knowledge/dictionarySlot.ts": {
+   "bytes": 2824
+  },
+  "src/brain/knowledge/slot.ts": {
+   "bytes": 3286
   },
   "src/brain/lexicon.ts": {
    "bytes": 10961
@@ -384,11 +393,20 @@
   "tests/dictionary.test.ts": {
    "bytes": 11386
   },
+  "tests/dictionaryProvider.test.ts": {
+   "bytes": 9073
+  },
+  "tests/dictionarySlot.test.ts": {
+   "bytes": 2636
+  },
   "tests/elapsedFormat.test.ts": {
    "bytes": 1054
   },
   "tests/kernel.test.ts": {
    "bytes": 22288
+  },
+  "tests/knowledgeSlot.test.ts": {
+   "bytes": 3036
   },
   "tests/lexicon.test.ts": {
    "bytes": 18498
