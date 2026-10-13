@@ -1,6 +1,6 @@
 {
  "version": 2,
- "seal": "ce3843fd503106ae0a6a17dcd1db5c93103fdffc704341d4fdb3e933d3e6515e",
+ "seal": "9af6a679c81dc7c60dc0705eb679279edea5bc058145729da0ab824ecf72f008",
  "dictionaries": [
   "public/dictionary/en"
  ],
@@ -348,6 +348,9 @@
   "src/services/axonBrainInterface.ts": {
    "bytes": 1475
   },
+  "src/services/exportPool.ts": {
+   "bytes": 1256
+  },
   "src/services/fileSaverPlugin.ts": {
    "bytes": 806
   },
@@ -401,6 +404,9 @@
   },
   "tests/elapsedFormat.test.ts": {
    "bytes": 1054
+  },
+  "tests/exportPool.test.ts": {
+   "bytes": 2388
   },
   "tests/kernel.test.ts": {
    "bytes": 22288
