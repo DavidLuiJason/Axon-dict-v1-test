@@ -18,7 +18,7 @@
     "prebuild": "node tools/snapshot.mjs",
     "predev": "node tools/snapshot.mjs",
     "test:snapshot": "node tools/snapshot.mjs --check",
-    "test:foundation": "node tests/snapshot.test.mjs && python3 tests/autoUnpack.test.py && python3 tests/packDictionary.test.py"
+    "test:foundation": "node tests/snapshot.test.mjs && python3 tests/autoUnpack.test.py && python3 tests/packDictionary.test.py && tsx tests/exportPool.test.ts"
   },
   "dependencies": {
     "@capacitor/android": "^7.2.0",

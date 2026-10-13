@@ -277,6 +277,12 @@ export const AxonSourceScreen: React.FC<AxonSourceScreenProps> = ({
         userName,
         selectedModel,
         activeChatId,
+        onProgress: ({ phase, done, total }) => {
+          // Update the line only now and then so thousands of files do not cause thousands of redraws.
+          if (done === total || done % 25 === 0) {
+            setUpdateStatus(phase === 'verify' ? `Checking files: ${done} of ${total}` : `Packing the ZIP: ${done}%`);
+          }
+        },
       });
       if (result.success) {
         setUpdateStatus(result.message || 'Saved verified ZIP archive');

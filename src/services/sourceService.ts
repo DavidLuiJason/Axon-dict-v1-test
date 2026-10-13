@@ -5,6 +5,7 @@
 import JSZip from 'jszip';
 import { RecentChat } from '../types';
 import { saveFile, SaveFileResult } from './saveFile';
+import { mapPool } from './exportPool';
 
 export interface SourceNode {
   name: string;
@@ -36,6 +37,8 @@ interface SnapshotManifest {
   sourceArchive: { path: string; bytes: number; sha256: string };
   files: SnapshotEntry[];
 }
+/** Files checked at the same time during an export. Bounded, so it never fans out into thousands of requests. */
+const EXPORT_PARALLEL = 16;
 const assetBase = `${import.meta.env.BASE_URL}_axon-source/`;
 let lastManifest: SnapshotManifest | null = null;
 let sourceZip: JSZip | null = null;
@@ -157,15 +160,25 @@ export interface ExportZipOptions {
   userName: string;
   selectedModel: string;
   activeChatId: string | null;
+  /** Called while exporting: phase 'verify' counts files, phase 'pack' counts percent. */
+  onProgress?: (info: { phase: 'verify' | 'pack'; done: number; total: number }) => void;
 }
 export async function exportAsZip(options: ExportZipOptions): Promise<SaveFileResult> {
   const manifest = await getManifest(true);
   const complete = options.includeDictionary !== false;
   const zip = new JSZip();
   const selected = manifest.files.filter((f) => complete || f.zone === 'Z1');
+  const startedAt = Date.now();
   // Every file must pass its size and SHA-256 check before a ZIP can be saved.
-  // Work one file at a time so dictionary reads never fan out into thousands of requests.
-  for (const entry of selected) zip.file(entry.path, await readEntry(entry, manifest));
+  // A small fixed number of files are checked at once (EXPORT_PARALLEL): the same checks,
+  // far less waiting for the network. Results keep the manifest order, so the ZIP is the same.
+  if (selected.some((f) => f.zone === 'Z1')) await loadZ1(manifest); // load the source archive once, before the lanes start
+  const verified = await mapPool(selected, EXPORT_PARALLEL, (entry) => readEntry(entry, manifest),
+    (done, total) => options.onProgress?.({ phase: 'verify', done, total }));
+  selected.forEach((entry, i) => {
+    // Dictionary text is large and compresses well at a cheaper setting; the file bytes are unchanged.
+    zip.file(entry.path, verified[i], entry.zone === 'Z2' ? { compression: 'DEFLATE', compressionOptions: { level: 3 } } : undefined);
+  });
   if (options.withUserData) {
     const folder = zip.folder('user-data')!;
     const exportedAt = new Date().toISOString();
@@ -178,10 +191,11 @@ export async function exportAsZip(options: ExportZipOptions): Promise<SaveFileRe
     }
     folder.file('conversation-history.md', history);
   }
-  const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+  const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } },
+    (meta) => options.onProgress?.({ phase: 'pack', done: Math.round(meta.percent), total: 100 }));
   const day = new Date().toISOString().slice(0, 10);
   const name = !complete ? `axon-SOURCE-ONLY-NOT-A-PROJECT-${day}.zip` : options.withUserData ? `axon-source-with-userdata-${day}.zip` : `axon-source-code-${day}.zip`;
   const saved = await saveFile(name, blob, 'application/zip');
   if (!saved.success) throw new Error(saved.error || 'Unable to save verified source ZIP');
-  return { ...saved, message: `${complete ? 'Complete verified project' : 'INCOMPLETE source only (NOT a project)'}: ${selected.length}/${manifest.files.length} files, ${selected.reduce((sum, e) => sum + e.bytes, 0)} bytes verified. ${saved.message ?? ''}` };
+  return { ...saved, message: `${complete ? 'Complete verified project' : 'INCOMPLETE source only (NOT a project)'}: ${selected.length}/${manifest.files.length} files, ${selected.reduce((sum, e) => sum + e.bytes, 0)} bytes verified in ${((Date.now() - startedAt) / 1000).toFixed(1)} s. ${saved.message ?? ''}` };
 }
