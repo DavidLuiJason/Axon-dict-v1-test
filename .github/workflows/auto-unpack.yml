@@ -6,6 +6,10 @@ on:
 permissions:
   contents: write
   actions: write
+# One unpack at a time: two uploads close together must not push over each other.
+concurrency:
+  group: auto-unpack
+  cancel-in-progress: false
 jobs:
   unpack:
     runs-on: ubuntu-24.04
@@ -39,7 +43,16 @@ jobs:
           git config user.email axon-unpack@users.noreply.github.com
           git add -A
           git commit -m "Auto-unpack verified project upload"
-          git push
+          # The branch may have moved while this run worked (a second upload, another bot commit).
+          # Then the first push is rejected: fetch the newer commits, put ours on top, try again.
+          git fetch --unshallow origin 2>/dev/null || true
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "Push rejected (branch moved); rebasing onto the newest commits, attempt ${attempt} of 3."
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+          done
+          echo "Could not push after 3 tries; nothing was lost, the uploaded ZIP is still in the repository."
+          exit 1
       - name: Start Android build (bot commits do not trigger push workflows)
         if: steps.detect.outputs.found == 'true'
         env:
