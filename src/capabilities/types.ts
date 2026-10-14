@@ -9,6 +9,28 @@
  * not register a capability; registration is an explicit function call only.
  */
 
+/** The current chat-access status of a registered action. */
+export type ChatActionStatus = 'available' | 'needs-screen' | 'needs-permission' | 'not-built';
+
+/** An input a chat action may need before it can run. */
+export interface ChatActionInput {
+  name: string;
+  kind: 'text' | 'choice' | 'file' | 'yes-no';
+  choices?: string[];
+  prompt?: string;
+}
+
+/** One user-facing action declared by a capability. */
+export interface ChatAction {
+  id: string;
+  purpose: string;
+  examples: string[];
+  status: ChatActionStatus;
+  inputs?: ChatActionInput[];
+  link?: { commandId?: string; actionId?: string; providerId?: string };
+  note?: string;
+}
+
 /**
  * Capability metadata contract.
  *
@@ -57,4 +79,10 @@ export interface Capability {
    * (a later stage) will widen this; nothing enforces it yet.
    */
   dataProvider?: 'noUserData';
+
+  /** Chat actions that truthfully describe this capability's user-facing work. */
+  chatActions?: ChatAction[];
+
+  /** Plain reason this capability has no chat action. */
+  noChatAction?: string;
 }

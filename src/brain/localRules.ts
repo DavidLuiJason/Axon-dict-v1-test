@@ -48,6 +48,8 @@ export interface LocalRulesOptions {
   now?: () => number;
   /** Built-in and taught meanings. Without it AXON reads messages exactly as written. */
   lexicon?: UserLexicon;
+  /** Optional registry-backed self-description and ability-question handler. */
+  abilities?: { describe(): string; answer(text: string): string | null };
 }
 
 export function createLocalRules(options: LocalRulesOptions): BrainProvider & {
@@ -128,6 +130,7 @@ export function createLocalRules(options: LocalRulesOptions): BrainProvider & {
   }
 
   function helpReply(): BrainReply {
+    if (options.abilities) return reply(options.abilities.describe());
     const lines = commands.map(
       (c, i) => `${i + 1}. ${c.title}. Try: "${c.examples[0]}".`
     );
@@ -249,6 +252,9 @@ export function createLocalRules(options: LocalRulesOptions): BrainProvider & {
         pending = null;
         return run(open.command, input);
       }
+
+      const abilityAnswer = options.abilities?.answer(text);
+      if (abilityAnswer !== null && abilityAnswer !== undefined) return reply(abilityAnswer);
 
       const plain = matcher.find(text);
       const taught = readWithMeanings(text);

@@ -7,6 +7,8 @@ import { registerAxonToolsCapability } from './capabilities/registerAxonTools';
 import { registerAxonSourceCapability } from './capabilities/registerAxonSource';
 import { registerInterfaceCaptureCapability } from './capabilities/registerInterfaceCapture';
 import { registerBackgroundProofCapability } from './capabilities/registerBackgroundProof';
+import { registerDictionaryCapability } from './capabilities/registerDictionary';
+import { registerPlannedCapabilities } from './capabilities/registerPlanned';
 import { registerSettingsInterface } from './interfaces/registerSettings';
 import { registerAxonToolsInterface } from './interfaces/registerAxonTools';
 import { registerAxonSourceInterface } from './interfaces/registerAxonSource';

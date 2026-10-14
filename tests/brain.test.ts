@@ -10,6 +10,13 @@ import { createFoundation } from '../src/brain/foundation';
 import { createBrain, PLANNED_SOURCES } from '../src/brain/brain';
 import type { BrainProvider, BrainReply, BrainRequest } from '../src/brain/types';
 import { sendQueryToAxonBoundary } from '../src/services/axonBrainInterface';
+import { registerAxonToolsCapability } from '../src/capabilities/registerAxonTools';
+import { registerSettingsCapability } from '../src/capabilities/registerSettings';
+import { registerAxonSourceCapability } from '../src/capabilities/registerAxonSource';
+import { registerInterfaceCaptureCapability } from '../src/capabilities/registerInterfaceCapture';
+import { registerBackgroundProofCapability } from '../src/capabilities/registerBackgroundProof';
+import { registerDictionaryCapability } from '../src/capabilities/registerDictionary';
+import { registerPlannedCapabilities } from '../src/capabilities/registerPlanned';
 
 let checks = 0;
 function assert(cond: boolean, msg: string) {
@@ -222,11 +229,25 @@ async function main() {
 
   console.log('-- the boundary the screens call');
   {
+    // The app registers these before the Brain is first used; mirror that here.
+    registerAxonToolsCapability();
+    registerSettingsCapability();
+    registerAxonSourceCapability();
+    registerInterfaceCaptureCapability();
+    registerBackgroundProofCapability();
+    registerDictionaryCapability();
+    registerPlannedCapabilities();
     const cmd = await sendQueryToAxonBoundary('count words in one two three');
     assert(cmd.role === 'assistant' && cmd.content.startsWith('That text has 3 words.'), 'a command is answered through the boundary');
     assert(cmd.source === 'local-rules' && typeof cmd.taskId === 'string', 'the message records its source and task');
     const help = await sendQueryToAxonBoundary('what can you do');
-    assert(help.source === 'local-rules' && help.content.includes('Count text'), 'help works through the boundary');
+    assert(
+      help.source === 'local-rules' &&
+      help.content.includes('Count text') &&
+      help.content.includes('Look up an English word or short phrase in the dictionary') &&
+      help.content.includes('Source: AXON capability registry.'),
+      'help through the boundary lists registry actions, including the dictionary, and names the registry'
+    );
     const normal = await sendQueryToAxonBoundary('hello there');
     assert(normal.source === 'foundation' && normal.content.includes("AXON's intelligence layer isn't online yet"), 'any other message gets the honest foundation reply');
     assert(normal.hasSources === false && typeof normal.id === 'string' && normal.timestamp > 0, 'the message is well formed');

@@ -11,7 +11,7 @@
     "lint": "tsc --noEmit",
     "test:chat": "tsx tests/chatSession.test.ts && tsx tests/crash.test.ts",
     "test:bg": "tsx tests/elapsedFormat.test.ts && tsx tests/verdict.test.ts",
-    "test:kernel": "tsx tests/kernel.test.ts && tsx tests/brain.test.ts && tsx tests/matcher.test.ts && tsx tests/lexicon.test.ts && tsx tests/tools.test.ts && tsx tests/knowledgeSlot.test.ts && tsx tests/dictionarySlot.test.ts && tsx tests/dictionaryProvider.test.ts && tsx tests/dictionary.test.ts && tsx tests/symbols.test.ts && tsx tests/dictionaryPolish.test.ts",
+    "test:kernel": "tsx tests/kernel.test.ts && tsx tests/brain.test.ts && tsx tests/matcher.test.ts && tsx tests/lexicon.test.ts && tsx tests/tools.test.ts && tsx tests/knowledgeSlot.test.ts && tsx tests/dictionarySlot.test.ts && tsx tests/dictionaryProvider.test.ts && tsx tests/dictionary.test.ts && tsx tests/symbols.test.ts && tsx tests/dictionaryPolish.test.ts && tsx tests/capabilityTruth.test.ts",
     "cap:sync": "npx cap sync android",
     "cap:open": "npx cap open android",
     "android:assemble": "cd android && ./gradlew assembleDebug",

@@ -9,12 +9,20 @@
  */
 
 import { registerCapability, getCapability } from './registry';
+import type { ChatAction } from './types';
 
 const AXON_SOURCE_CAPABILITY = {
   id: 'cap.axon-source',
   displayName: 'AXON Source',
   contractVersion: '1.0.0',
   implementationVersion: '1.0.0',
+  chatActions: [{
+    id: 'act.axon-source.export',
+    purpose: 'Export the AXON source project',
+    examples: ['export the source'],
+    status: 'needs-screen',
+    note: 'export is on the Source screen; asking for it by chat is stage C3',
+  }] as ChatAction[],
 } as const;
 
 /**

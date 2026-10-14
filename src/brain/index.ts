@@ -13,6 +13,11 @@ import { createUserLexicon, type KeyValueStore, type UserLexicon } from './lexic
 import { createLocalRules } from './localRules';
 import { createDictionaryProvider } from './knowledge/dictionaryProvider';
 import { TEXT_COUNT_COMMAND } from './textCountCommand';
+import { answerAbilityQuestion, describeAbilities } from './abilities';
+
+export const BRAIN_COMMANDS = [TEXT_COUNT_COMMAND];
+const BRAIN_PROVIDERS = [createDictionaryProvider()];
+export const BRAIN_PROVIDER_IDS = BRAIN_PROVIDERS.map((provider) => provider.id);
 
 let shared: Brain | null = null;
 let sharedLexicon: UserLexicon | null = null;
@@ -34,12 +39,16 @@ export function getUserLexicon(): UserLexicon {
 export function getAxonBrain(): Brain {
   if (!shared) {
     const localRules = createLocalRules({
-      commands: [TEXT_COUNT_COMMAND],
+      commands: BRAIN_COMMANDS,
       engine: getAxonEngine(),
       planned: PLANNED_SOURCES,
       lexicon: getUserLexicon(),
+      abilities: {
+        describe: () => describeAbilities({ lexiconExists: true }),
+        answer: answerAbilityQuestion,
+      },
     });
-    shared = createBrain([localRules, createDictionaryProvider()], createFoundation());
+    shared = createBrain([localRules, ...BRAIN_PROVIDERS], createFoundation());
   }
   return shared;
 }

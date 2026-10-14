@@ -8,7 +8,7 @@ import type { BrainProvider, BrainReply, BrainRequest } from '../types';
 import { dictionarySlot } from './dictionarySlot';
 import type { KnowledgeSlot } from './slot';
 
-const PROVIDER_ID = 'english-dictionary';
+export const DICTIONARY_PROVIDER_ID = 'english-dictionary';
 const SOURCE = 'Open English WordNet 2025';
 
 /** Accept only a complete, explicit lookup phrase with a short word/phrase target. */
@@ -48,12 +48,12 @@ function sourceLine(source: string, version: string): string {
 
 export function createDictionaryProvider(slot: KnowledgeSlot = dictionarySlot): BrainProvider {
   return {
-    id: PROVIDER_ID,
+    id: DICTIONARY_PROVIDER_ID,
     label: 'English dictionary',
     status() {
       const state = slot.status();
       return {
-        id: PROVIDER_ID,
+        id: DICTIONARY_PROVIDER_ID,
         label: 'English dictionary',
         ready: state.ready,
         note: state.note ?? `${state.source} ${state.version}; opens on first lookup`,
@@ -68,13 +68,13 @@ export function createDictionaryProvider(slot: KnowledgeSlot = dictionarySlot): 
 
       if (result.status === 'not-found') {
         return {
-          source: PROVIDER_ID,
+          source: DICTIONARY_PROVIDER_ID,
           content: `I do not have that word: ${word}.\n\n${citation}`,
         };
       }
       if (result.status === 'error') {
         return {
-          source: PROVIDER_ID,
+          source: DICTIONARY_PROVIDER_ID,
           content: `I could not check “${word}” because the dictionary returned an error: ${result.message}\n\n${citation}`,
         };
       }
@@ -83,7 +83,7 @@ export function createDictionaryProvider(slot: KnowledgeSlot = dictionarySlot): 
         `${index + 1}. ${sense.partOfSpeech}: ${sense.meaning}${sense.example ? `\n   Example: ${sense.example}` : ''}`,
       );
       return {
-        source: PROVIDER_ID,
+        source: DICTIONARY_PROVIDER_ID,
         content: `${result.word}\n\n${lines.join('\n')}\n\n${citation}`,
       };
     },

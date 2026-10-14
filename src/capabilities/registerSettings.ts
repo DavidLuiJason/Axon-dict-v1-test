@@ -8,12 +8,20 @@
  */
 
 import { registerCapability, getCapability } from './registry';
+import type { ChatAction } from './types';
 
 const SETTINGS_CAPABILITY = {
   id: 'cap.settings',
   displayName: 'Settings',
   contractVersion: '1.0.0',
   implementationVersion: '1.0.0',
+  chatActions: [{
+    id: 'act.settings.open',
+    purpose: 'Open AXON Settings',
+    examples: ['open settings'],
+    status: 'needs-screen',
+    note: 'Settings is on the Settings screen; asking for it by chat is not yet implemented',
+  }] as ChatAction[],
 } as const;
 
 /**

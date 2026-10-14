@@ -23,6 +23,7 @@ const INTERFACE_CAPTURE_CAPABILITY = {
    * Not a production 1.x implementation.
    */
   implementationVersion: '0.0.0-shell',
+  noChatAction: 'shell only',
 } as const;
 
 /**

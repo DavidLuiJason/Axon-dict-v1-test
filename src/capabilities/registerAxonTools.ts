@@ -8,6 +8,7 @@
  */
 
 import { registerCapability, getCapability } from './registry';
+import type { ChatAction } from './types';
 
 const AXON_TOOLS_CAPABILITY = {
   id: 'cap.axon-tools',
@@ -26,6 +27,17 @@ const TEXT_TOOLS_CAPABILITY = {
   contractVersion: '1.0.0',
   implementationVersion: '1.0.0',
   dataProvider: 'noUserData',
+  chatActions: [{
+    id: 'act.text-counter',
+    purpose: 'Count text',
+    examples: [
+      'count words in hello brave new world',
+      'how many characters are in good morning',
+      'count lines',
+    ],
+    status: 'available',
+    link: { commandId: 'text-count', actionId: 'text.count' },
+  }] as ChatAction[],
 } as const;
 
 /**

@@ -14,6 +14,7 @@ const BACKGROUND_PROOF_CAPABILITY = {
   displayName: 'Background Proof',
   contractVersion: '1.0.0',
   implementationVersion: '1.0.0',
+  noChatAction: 'proof only',
 } as const;
 
 /**

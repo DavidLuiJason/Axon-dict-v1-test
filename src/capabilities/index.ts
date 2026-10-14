@@ -5,10 +5,11 @@
  * Public entry for the capability system (Stage 2).
  */
 
-export type { Capability } from './types';
+export type { Capability, ChatAction, ChatActionInput, ChatActionStatus } from './types';
 export {
   registerCapability,
   getCapability,
   listCapabilities,
+  listChatActions,
   getRegistrySnapshot,
 } from './registry';
