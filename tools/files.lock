@@ -1,6 +1,6 @@
 {
  "version": 2,
- "seal": "9af6a679c81dc7c60dc0705eb679279edea5bc058145729da0ab824ecf72f008",
+ "seal": "a9c00cad32ead8147c9f56d075a3b3b117a607cbf10bf0c7c77f58463c870c2e",
  "dictionaries": [
   "public/dictionary/en"
  ],
@@ -201,6 +201,18 @@
   "src/brain/matcher.ts": {
    "bytes": 1999
   },
+  "src/brain/symbols/codeRegions.ts": {
+   "bytes": 6781
+  },
+  "src/brain/symbols/protect.ts": {
+   "bytes": 1970
+  },
+  "src/brain/symbols/readPunctuation.ts": {
+   "bytes": 1744
+  },
+  "src/brain/symbols/symbolRoles.ts": {
+   "bytes": 2897
+  },
   "src/brain/textCountCommand.ts": {
    "bytes": 4447
   },
@@ -396,6 +408,9 @@
   "tests/dictionary.test.ts": {
    "bytes": 11386
   },
+  "tests/dictionaryPolish.test.ts": {
+   "bytes": 2359
+  },
   "tests/dictionaryProvider.test.ts": {
    "bytes": 9073
   },
@@ -407,6 +422,12 @@
   },
   "tests/exportPool.test.ts": {
    "bytes": 2388
+  },
+  "tests/fixtures/sym1-baseline.json": {
+   "bytes": 12806
+  },
+  "tests/fixtures/sym1-written-set.json": {
+   "bytes": 8593
   },
   "tests/kernel.test.ts": {
    "bytes": 22288
@@ -425,6 +446,9 @@
   },
   "tests/snapshot.test.mjs": {
    "bytes": 3137
+  },
+  "tests/symbols.test.ts": {
+   "bytes": 5308
   },
   "tests/tools.test.ts": {
    "bytes": 13833
