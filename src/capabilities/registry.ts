@@ -72,6 +72,17 @@ function assertValidMetadata(meta: Capability): void {
           action.examples.some((example) => typeof example !== 'string' || example.trim() === '')) {
         throw new Error(`[AXON capability registry] chat action needs at least one non-empty example (action=${action.id})`);
       }
+      if (action.status === 'not-built' && action.link) {
+        throw new Error(
+          `[AXON capability registry] not-built action must not have an implementation link: ${action.id}`
+        );
+      }
+      if (action.status === 'available' &&
+          (!action.link || !Object.values(action.link).some((value) => typeof value === 'string' && value.trim() !== ''))) {
+        throw new Error(
+          `[AXON capability registry] available action must have an implementation link: ${action.id}`
+        );
+      }
       if (localIds.has(action.id) || Array.from(byId.values()).some((registered) =>
         registered.chatActions?.some((existing) => existing.id === action.id))) {
         throw new Error(`[AXON capability registry] duplicate chat action id: ${action.id}`);

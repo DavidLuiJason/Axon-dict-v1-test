@@ -11,7 +11,15 @@ import type { BrainProvider, BrainReply } from './types';
 
 const SOURCE = 'foundation';
 
-export function createFoundation(): BrainProvider {
+export interface FoundationAbilities {
+  answerRequestFallback(text: string): string;
+}
+
+export interface FoundationOptions {
+  abilities?: FoundationAbilities;
+}
+
+export function createFoundation(options: FoundationOptions = {}): BrainProvider {
   return {
     id: SOURCE,
     label: 'AXON foundation',
@@ -52,8 +60,9 @@ export function createFoundation(): BrainProvider {
         };
       }
 
-      const lead =
-        "I'm here, but AXON's intelligence layer isn't online yet. We're building the environment first. Once the AXON brain is connected, I'll be able to process and respond to your requests directly.";
+      const lead = options.abilities
+        ? `${options.abilities.answerRequestFallback(request.text)} The rest of my understanding is still being built.`
+        : "I'm here, but AXON's intelligence layer isn't online yet. We're building the environment first. Once the AXON brain is connected, I'll be able to process and respond to your requests directly.";
       return {
         content: lead,
         source: SOURCE,

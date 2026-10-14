@@ -9,6 +9,8 @@ import { registerInterfaceCaptureCapability } from './capabilities/registerInter
 import { registerBackgroundProofCapability } from './capabilities/registerBackgroundProof';
 import { registerDictionaryCapability } from './capabilities/registerDictionary';
 import { registerPlannedCapabilities } from './capabilities/registerPlanned';
+import { registerTaughtMeaningsCapability } from './capabilities/registerTaughtMeanings';
+import { registerPlannedMediaCapabilities } from './capabilities/registerPlannedMedia';
 import { registerSettingsInterface } from './interfaces/registerSettings';
 import { registerAxonToolsInterface } from './interfaces/registerAxonTools';
 import { registerAxonSourceInterface } from './interfaces/registerAxonSource';
@@ -27,6 +29,10 @@ registerAxonSourceCapability();
 registerInterfaceCaptureCapability();
 // Stage 6: Background Proof capability
 registerBackgroundProofCapability();
+// Phase C2: taught meanings are available through the existing local rules.
+registerTaughtMeaningsCapability();
+// Phase C2: planned media actions are declared honestly before implementation.
+registerPlannedMediaCapabilities();
 // Stage 4A: Settings interface (declarative; not tied to modal open state)
 registerSettingsInterface();
 // Stage 4B: AXON Tools interface (declarative; not tied to currentScreen)

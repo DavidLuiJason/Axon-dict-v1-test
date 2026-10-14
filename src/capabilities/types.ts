@@ -27,7 +27,7 @@ export interface ChatAction {
   examples: string[];
   status: ChatActionStatus;
   inputs?: ChatActionInput[];
-  link?: { commandId?: string; actionId?: string; providerId?: string };
+  link?: { commandId?: string; actionId?: string; providerId?: string; ruleId?: string };
   note?: string;
 }
 

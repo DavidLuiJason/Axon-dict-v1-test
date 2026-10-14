@@ -13,7 +13,7 @@ import { createUserLexicon, type KeyValueStore, type UserLexicon } from './lexic
 import { createLocalRules } from './localRules';
 import { createDictionaryProvider } from './knowledge/dictionaryProvider';
 import { TEXT_COUNT_COMMAND } from './textCountCommand';
-import { answerAbilityQuestion, describeAbilities } from './abilities';
+import { answerAbilityQuestion, answerRequestFallback, describeAbilities } from './abilities';
 
 export const BRAIN_COMMANDS = [TEXT_COUNT_COMMAND];
 const BRAIN_PROVIDERS = [createDictionaryProvider()];
@@ -48,7 +48,7 @@ export function getAxonBrain(): Brain {
         answer: answerAbilityQuestion,
       },
     });
-    shared = createBrain([localRules, ...BRAIN_PROVIDERS], createFoundation());
+    shared = createBrain([localRules, ...BRAIN_PROVIDERS], createFoundation({ abilities: { answerRequestFallback } }));
   }
   return shared;
 }

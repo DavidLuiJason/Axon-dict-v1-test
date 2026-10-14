@@ -15,6 +15,7 @@ const AXON_TOOLS_CAPABILITY = {
   displayName: 'AXON Tools',
   contractVersion: '1.0.0',
   implementationVersion: '1.0.0',
+  noChatAction: 'The Text Tools child capability owns the registered chat action.',
 } as const;
 
 /**

@@ -18,11 +18,14 @@ import type { Reading } from './matcher';
 import { applyMeanings, parseTeach } from './lexicon';
 import type { TeachRequest, UserLexicon } from './lexicon';
 import type { BrainProvider, BrainReply, BrainRequest, CommandDef } from './types';
+import { CANCEL_WORDS } from './followUpWords';
+
+/** Stable ids for the user-facing teaching rules implemented by parseTeach. */
+export const LOCAL_RULE_IDS = ['teach', 'list', 'forget', 'forget-all'] as const;
 
 /** How long a follow-up question stays open. */
 export const PENDING_TTL_MS = 120_000;
 
-const CANCEL_WORDS = new Set(['cancel', 'stop', 'never mind', 'nevermind', 'forget it', 'no']);
 const YES_WORDS = new Set(['yes', 'y', 'yeah', 'yep', 'yup', 'sure', 'ok', 'okay', 'correct', 'do it']);
 const HELP = /^(?:help|what can you do|what do you do|what tools do you have|what commands (?:do you have|can i use))\s*[?.!]*$/i;
 

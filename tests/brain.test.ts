@@ -17,6 +17,9 @@ import { registerInterfaceCaptureCapability } from '../src/capabilities/register
 import { registerBackgroundProofCapability } from '../src/capabilities/registerBackgroundProof';
 import { registerDictionaryCapability } from '../src/capabilities/registerDictionary';
 import { registerPlannedCapabilities } from '../src/capabilities/registerPlanned';
+import { registerTaughtMeaningsCapability } from '../src/capabilities/registerTaughtMeanings';
+import { registerPlannedMediaCapabilities } from '../src/capabilities/registerPlannedMedia';
+import { answerRequestFallback } from '../src/brain/abilities';
 
 let checks = 0;
 function assert(cond: boolean, msg: string) {
@@ -61,6 +64,15 @@ function fake(id: string, opts: { hold?: boolean; reply?: string | null; throws?
 
 async function main() {
   console.log('=== brain tests ===');
+  registerAxonToolsCapability();
+  registerSettingsCapability();
+  registerAxonSourceCapability();
+  registerInterfaceCaptureCapability();
+  registerBackgroundProofCapability();
+  registerDictionaryCapability();
+  registerPlannedCapabilities();
+  registerTaughtMeaningsCapability();
+  registerPlannedMediaCapabilities();
 
   console.log('-- countText');
   assert(JSON.stringify(countText('')) === JSON.stringify({ characters: 0, charactersNoSpaces: 0, letters: 0, words: 0, lines: 0 }), 'empty text counts as zero everywhere');
@@ -223,6 +235,9 @@ async function main() {
     assert(generic !== null && generic.source === 'foundation' && generic.content.includes("AXON's intelligence layer isn't online yet"), 'the generic reply is honest');
     assert(generic!.suggestionPrompt === 'Say "what can you do" to see what I can run right now.', 'the generic reply points to what AXON can do');
     assert((generic!.planItems ?? []).length === 4, 'the generic reply keeps its four foundation notes');
+    const withAbilities = createFoundation({ abilities: { answerRequestFallback } });
+    const unknown = await withAbilities.handle(ask('could you make a collage?'));
+    assert(unknown !== null && unknown.content.startsWith('Not built yet: Make a collage from pictures with a style choice.') && unknown.content.includes('The rest of my understanding is still being built.'), 'foundation catch-all uses the registry-backed request fallback');
     const layout = await f.handle(ask('describe axon ui'));
     assert(layout !== null && layout.content.includes('Chat / Web / Apps switch') && (layout.planItems ?? []).length === 3 && layout.hasSources === true, 'the layout reply is unchanged');
   }
@@ -230,13 +245,6 @@ async function main() {
   console.log('-- the boundary the screens call');
   {
     // The app registers these before the Brain is first used; mirror that here.
-    registerAxonToolsCapability();
-    registerSettingsCapability();
-    registerAxonSourceCapability();
-    registerInterfaceCaptureCapability();
-    registerBackgroundProofCapability();
-    registerDictionaryCapability();
-    registerPlannedCapabilities();
     const cmd = await sendQueryToAxonBoundary('count words in one two three');
     assert(cmd.role === 'assistant' && cmd.content.startsWith('That text has 3 words.'), 'a command is answered through the boundary');
     assert(cmd.source === 'local-rules' && typeof cmd.taskId === 'string', 'the message records its source and task');
@@ -249,7 +257,7 @@ async function main() {
       'help through the boundary lists registry actions, including the dictionary, and names the registry'
     );
     const normal = await sendQueryToAxonBoundary('hello there');
-    assert(normal.source === 'foundation' && normal.content.includes("AXON's intelligence layer isn't online yet"), 'any other message gets the honest foundation reply');
+    assert(normal.source === 'foundation' && normal.content.includes('I do not have a way to do that, and I will not guess.') && normal.content.includes('The rest of my understanding is still being built.'), 'any other message gets the registry-backed honest foundation reply');
     assert(normal.hasSources === false && typeof normal.id === 'string' && normal.timestamp > 0, 'the message is well formed');
   }
 
