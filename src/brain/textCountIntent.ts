@@ -8,6 +8,7 @@
  */
 
 import type { Understanding } from './types';
+import { protectCodeRegions, restoreProtectedText } from './symbols/protect';
 
 type Unit = 'words' | 'characters' | 'letters' | 'lines';
 
@@ -153,7 +154,7 @@ function toUnit(word: string): Unit {
  * Score 1 means a cue, a unit and the text were all found: run it. 0.75 means
  * cue and unit but no usable text: ask "Did you mean". Anything else is null.
  */
-export function understandTextCount(message: string): Understanding | null {
+function understandTextCountPlain(message: string): Understanding | null {
   const loc = locate(message);
   const unitMatch = UNIT.exec(loc.instruction);
   if (!unitMatch) return null;
@@ -178,4 +179,19 @@ export function understandTextCount(message: string): Understanding | null {
     ...(hasText ? {} : { ask: { field: 'text', question: TEXT_QUESTION } }),
     summary: `count the ${unit} in ${hasText ? 'the text you gave' : 'some text'}`,
   };
+}
+
+
+/** Interpret a text-count request while shielding detected code from intent parsing. */
+export function understandTextCount(message: string): Understanding | null {
+  const protectedText = protectCodeRegions(message);
+  const originalLocation = locate(message);
+  const payloadUnsure = originalLocation.payload !== undefined && protectCodeRegions(originalLocation.payload).unsure;
+  const result = understandTextCountPlain(protectedText.text);
+  if (!result) return result;
+  if (result.input && typeof result.input === 'object' && 'text' in result.input && typeof result.input.text === 'string') {
+    result.input.text = restoreProtectedText(result.input.text, protectedText);
+  }
+  if (protectedText.unsure || payloadUnsure) result.summary += ' (I could not tell whether part of the text is code, so I counted all of it as ordinary text.)';
+  return result;
 }

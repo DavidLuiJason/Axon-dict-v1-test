@@ -10,6 +10,8 @@
 import type { TextCounts } from '../kernel/textCount';
 import type { CommandDef, CommandMatch } from './types';
 import { cleanPayload, TEXT_KEYWORDS, TEXT_QUESTION, understandTextCount } from './textCountIntent';
+import { protectCodeRegions, restoreProtectedText } from './symbols/protect';
+import { detectCodeRegions } from './symbols/codeRegions';
 
 export { TEXT_QUESTION };
 
@@ -28,6 +30,8 @@ const PATTERNS: RegExp[] = [
   // word count / word count: <text> / character count of <text>
   new RegExp(`^${LEAD}(word|character|char|letter|line)\\s+count\\b\\s*(?:of|in|for)?\\s*[:\\-]?\\s*([\\s\\S]*)$`, 'i'),
 ];
+
+const uncertainInputs = new WeakSet<object>();
 
 const DEICTIC = new Set([
   'this', 'this text', 'this sentence', 'this message', 'this paragraph',
@@ -77,16 +81,22 @@ export const TEXT_COUNT_COMMAND: CommandDef = {
   ],
 
   match(message: string): CommandMatch | null {
+    const protectedText = protectCodeRegions(message);
+    const uncertainOriginal = protectedText.unsure || /:\s*\S[^\n]*\n(?: {4,}|\t)\S/m.test(message);
     for (const pattern of PATTERNS) {
-      const m = pattern.exec(message.trim());
+      const m = pattern.exec(protectedText.text.trim());
       if (!m) continue;
       const unit = toUnit(m[1]);
       const cleaned = cleanText(m[2] ?? '');
       const missing = cleaned === '' || DEICTIC.has(cleaned.toLowerCase().replace(/[?.!]+$/, ''));
       if (missing) {
-        return { input: { unit }, ask: { field: 'text', question: TEXT_QUESTION } };
+        const input = { unit };
+        if (uncertainOriginal) uncertainInputs.add(input);
+        return { input, ask: { field: 'text', question: TEXT_QUESTION } };
       }
-      return { input: { text: cleaned, unit } };
+      const input = { text: restoreProtectedText(cleaned, protectedText), unit };
+      if (uncertainOriginal || detectCodeRegions(input.text).unsure) uncertainInputs.add(input);
+      return { input };
     }
     return null;
   },
@@ -120,6 +130,13 @@ export const TEXT_COUNT_COMMAND: CommandDef = {
       default:
         headline = 'Here are the counts for that text:';
     }
-    return `${headline}\n\n${details}`;
+    const text = typeof input.text === 'string' ? input.text : '';
+    const code = detectCodeRegions(text);
+    const note = code.regions.length
+      ? `\n\nNote: I found ${code.regions.length} code ${code.regions.length === 1 ? 'part' : 'parts'} and counted ${code.regions.length === 1 ? 'it' : 'them'} exactly as written. I changed nothing.`
+      : (code.unsure || uncertainInputs.has(input))
+        ? `\n\nNote: I could not tell whether part of the text is code, so I counted all of it as ordinary text.`
+        : '';
+    return `${headline}\n\n${details}${note}`;
   },
 };

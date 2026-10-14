@@ -11,7 +11,10 @@ import { readZip } from './zip-reader.mjs';
 
 const ROOT = resolve(process.cwd());
 const OUTPUT = 'public/_axon-source';
-export const EXCLUDED = ['node_modules/', '.git/', 'dist/', 'build/', 'android/', '.gradle/', 'coverage/', '.cache/', '.capacitor/', 'public/_axon-source/', '.DS_Store'];
+export const EXCLUDED = ['node_modules/', '.git/', 'dist/', 'build/', 'android/', '.gradle/', 'coverage/', '.cache/', '.capacitor/', 'public/_axon-source/', '.DS_Store',
+  // Files that package installers and operating systems create by themselves (AI Studio adds bun.lock).
+  // Listed one by one on purpose: an unknown stray file must still show up as a difference. package-lock.json is NOT here.
+  'bun.lock', 'bun.lockb', 'yarn.lock', 'pnpm-lock.yaml', 'Thumbs.db'];
 const MAX_Z1_FILES = 600;
 const MAX_Z1_BYTES = 25 * 1024 * 1024;
 const sha = (b) => createHash('sha256').update(b).digest('hex');

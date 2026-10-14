@@ -31,6 +31,10 @@ function lookupTerm(message: string): string | null {
     }
   }
   if (!candidate) return null;
+  // Natural lookup phrasings may explicitly name the object being defined.
+  candidate = candidate.replace(/^the\s+(?:word|term)\s+/i, '').trim();
+  candidate = candidate.replace(/^the\s+(?:meaning|definition)\s+of\s+/i, '').trim();
+  if (!candidate || /^(?:the|a|an)$/i.test(candidate)) return null;
 
   // Do not reinterpret the lexicon's "define X as Y" teaching syntax as a lookup.
   if (/\b(?:as|means|stands\s+for)\b/i.test(candidate)) return null;
