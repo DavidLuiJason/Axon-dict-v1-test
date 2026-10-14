@@ -1,6 +1,6 @@
 {
  "version": 2,
- "seal": "6542dfb88c35bb932b745d008193ad2e28220ca06d545f4c32a51d7782263fb1",
+ "seal": "dc5112073c39f6d7434ac66c7d13471ce5e8d7068bb7fd831c66bc2bcee5b0b7",
  "dictionaries": [
   "public/dictionary/en"
  ],
@@ -150,6 +150,9 @@
   "src/brain/abilities.ts": {
    "bytes": 4310
   },
+  "src/brain/asking.ts": {
+   "bytes": 5871
+  },
   "src/brain/brain.ts": {
    "bytes": 2073
   },
@@ -179,6 +182,9 @@
   },
   "src/brain/dictionaryAccess.ts": {
    "bytes": 792
+  },
+  "src/brain/followUpWords.ts": {
+   "bytes": 249
   },
   "src/brain/foundation.ts": {
    "bytes": 2841
@@ -246,8 +252,14 @@
   "src/capabilities/registerPlanned.ts": {
    "bytes": 1167
   },
+  "src/capabilities/registerPlannedMedia.ts": {
+   "bytes": 1515
+  },
   "src/capabilities/registerSettings.ts": {
    "bytes": 767
+  },
+  "src/capabilities/registerTaughtMeanings.ts": {
+   "bytes": 1554
   },
   "src/capabilities/registry.ts": {
    "bytes": 2430
@@ -401,6 +413,9 @@
   },
   "src/types/index.ts": {
    "bytes": 834
+  },
+  "tests/askChoices.test.ts": {
+   "bytes": 6407
   },
   "tests/autoUnpack.test.py": {
    "bytes": 2008
