@@ -1,6 +1,6 @@
 {
  "version": 2,
- "seal": "a9c00cad32ead8147c9f56d075a3b3b117a607cbf10bf0c7c77f58463c870c2e",
+ "seal": "6542dfb88c35bb932b745d008193ad2e28220ca06d545f4c32a51d7782263fb1",
  "dictionaries": [
   "public/dictionary/en"
  ],
@@ -147,6 +147,9 @@
   "src/background/webFallbackAdapter.ts": {
    "bytes": 5695
   },
+  "src/brain/abilities.ts": {
+   "bytes": 4310
+  },
   "src/brain/brain.ts": {
    "bytes": 2073
   },
@@ -234,8 +237,14 @@
   "src/capabilities/registerBackgroundProof.ts": {
    "bytes": 863
   },
+  "src/capabilities/registerDictionary.ts": {
+   "bytes": 893
+  },
   "src/capabilities/registerInterfaceCapture.ts": {
    "bytes": 1235
+  },
+  "src/capabilities/registerPlanned.ts": {
+   "bytes": 1167
   },
   "src/capabilities/registerSettings.ts": {
    "bytes": 767
@@ -398,6 +407,9 @@
   },
   "tests/brain.test.ts": {
    "bytes": 14470
+  },
+  "tests/capabilityTruth.test.ts": {
+   "bytes": 8399
   },
   "tests/chatSession.test.ts": {
    "bytes": 6145
